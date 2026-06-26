@@ -490,6 +490,9 @@ function renderDashboard(data) {
       const topPct = totalLeads > 0 ? ((topCount / totalLeads) * 100).toFixed(0) : 0;
       setHtml('kpi-top-outlet', topName.replace(' ', '<br>'));
       set('kpi-top-outlet-pct', `${topPct}% of all leads`);
+    } else {
+      setHtml('kpi-top-outlet', '—');
+      set('kpi-top-outlet-pct', totalLeads > 0 ? 'No outlet tagged' : '');
     }
 
     set('kpi-visits-trend', totalVisits > 0 ? `${totalVisits} page loads total` : 'No visits yet');
