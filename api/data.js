@@ -92,6 +92,8 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     leads:         leads.slice(-20).reverse(), // last 20, newest first
+    allLeads:      leads,   // full set — enables client-side date-range filtering
+    allVisits:     visits,  // full set — enables client-side date-range filtering
     totalLeads:    leads.length,
     totalVisits:   visits.length,
     outletMap,
