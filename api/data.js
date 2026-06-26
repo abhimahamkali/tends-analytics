@@ -17,7 +17,7 @@ async function fetchAll(pat, tableId) {
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
+  res.setHeader('Cache-Control', 'no-store');
 
   const pat = process.env.AIRTABLE_PAT;
   if (!pat) return res.status(500).json({ error: 'No AIRTABLE_PAT' });
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       age:           f['Age']            || '',
       weight:        f['Weight (kg)']    || '',
       activityLevel: f['Activity Level'] || '',
-      outlet:        typeof f['Outlet'] === 'object' ? f['Outlet'].name : (f['Outlet'] || 'Unknown'),
+      outlet:        (typeof f['Outlet'] === 'object' ? f['Outlet'].name : (f['Outlet'] || 'Unknown')).replace(/\b\w/g, c => c.toUpperCase()),
       source:        f['Source']         || '',
       submittedAt:   f['Submitted At']   || r.createdTime,
     };
