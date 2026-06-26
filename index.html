@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TENDs × Earth — Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2A4A; --navy2:#22335c; --navy3:#2d4470;
+  --cream:#FBF7EC; --paper:#fff;
+  --gold:#CD3A54; --gold-lt:#f5b8c4; --gold-dk:#a82e45;
+  --sage:#6E8A7F; --ink:#2b2e33; --mute:#7a7468;
+  --line:#E6DFCE; --bg:#f0ebe0;
+  --radius:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 18px rgba(0,0,0,.07);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── HEADER ── */
+.topbar{background:var(--navy);color:#fff;padding:0 28px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-name{font-size:17px;font-weight:700;letter-spacing:.2px}
+.brand-name em{font-style:normal;color:var(--gold)}
+.badge{background:rgba(205,58,84,.18);color:var(--gold-lt);
+  border:1px solid rgba(205,58,84,.3);padding:3px 10px;
+  border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.6px}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.daterange{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);
+  color:#d4dbe8;padding:6px 14px;border-radius:8px;font-size:13px}
+.live{display:flex;align-items:center;gap:5px;font-size:12px;color:#93c5a8}
+.live::before{content:'';width:7px;height:7px;border-radius:50%;
+  background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ── NOTICE ── */
+.notice{background:#fffbea;border-bottom:1px solid #f0d06a;
+  padding:10px 28px;font-size:13px;color:#7a5c00;
+  display:flex;align-items:center;gap:8px}
+.notice a{color:var(--navy);font-weight:700;text-decoration:underline;cursor:pointer}
+
+/* ── MAIN ── */
+.main{max-width:1220px;margin:0 auto;padding:28px 24px 70px}
+
+/* ── KPI ROW ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.kpi{background:var(--paper);border-radius:var(--radius);padding:20px 22px;
+  box-shadow:var(--shadow);border:1px solid var(--line);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)}
+.kpi-label{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--mute);font-weight:600;margin-bottom:8px}
+.kpi-value{font-size:36px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:5px}
+.kpi-trend{font-size:12.5px;color:var(--sage);font-weight:600}
+.kpi-trend.down{color:var(--gold)}
+.kpi-note{font-size:11.5px;color:var(--mute);margin-top:3px}
+
+/* ── GRID LAYOUTS ── */
+.row-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px}
+.row-1-1{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+
+/* ── CARD ── */
+.card{background:var(--paper);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden}
+.card-head{padding:16px 20px 12px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13.5px;font-weight:700;color:var(--navy)}
+.card-sub{font-size:11.5px;color:var(--mute);margin-top:2px}
+.card-body{padding:20px}
+
+/* ── FUNNEL ── */
+.funnel{list-style:none}
+.fstep{display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px dashed var(--line)}
+.fstep:last-child{border-bottom:none}
+.fnum{width:22px;height:22px;border-radius:50%;background:var(--navy);
+  color:#fff;font-size:11px;font-weight:700;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.finfo{flex:1}
+.flabel{font-size:13px;font-weight:600;margin-bottom:4px}
+.fbar-wrap{height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+.fbar-fill{height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--navy),var(--navy3))}
+.fbar-fill.accent{background:linear-gradient(90deg,var(--gold),var(--gold-dk))}
+.fnums{text-align:right;min-width:56px}
+.fcount{font-size:14px;font-weight:700;color:var(--navy)}
+.fpct{font-size:11px;color:var(--mute)}
+.fdrop{font-size:11px;color:var(--gold);padding:2px 7px;
+  background:rgba(205,58,84,.09);border-radius:4px;white-space:nowrap;flex-shrink:0}
+
+/* ── OUTLET LEADERBOARD ── */
+.ol-list{list-style:none}
+.ol-item{display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--line)}
+.ol-item:last-child{border-bottom:none}
+.ol-rank{width:18px;font-size:12px;font-weight:700;color:var(--mute);flex-shrink:0}
+.ol-name{flex:1;font-size:13.5px;font-weight:600}
+.ol-bar-wrap{width:88px}
+.ol-bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.ol-bar-fill{height:100%;border-radius:99px;background:var(--gold)}
+.ol-count{font-size:13px;font-weight:700;color:var(--navy);width:28px;text-align:right}
+.ol-pct{font-size:11px;color:var(--mute);width:40px;text-align:right}
+
+/* ── LEADS TABLE ── */
+.leads-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.leads-tbl th{text-align:left;font-size:11px;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--mute);font-weight:700;
+  padding:0 12px 10px;border-bottom:2px solid var(--line)}
+.leads-tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.leads-tbl tr:last-child td{border-bottom:none}
+.leads-tbl tr:hover td{background:#faf8f3}
+.dog-name{font-weight:700;color:var(--navy)}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;
+  font-size:11.5px;font-weight:600;background:#eef3f1;color:var(--sage)}
+.time{color:var(--mute);font-size:12px}
+
+/* ── INSIGHTS ── */
+.insights{background:var(--navy);border-radius:var(--radius);
+  padding:30px;margin-top:4px;color:#fff}
+.ins-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ins-sub{color:#9aa3b5;font-size:13px;margin-bottom:24px}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ins-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:17px 18px}
+.ins-priority{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;
+  font-weight:700;margin-bottom:7px}
+.critical{color:#f87171}
+.high{color:#fbbf24}
+.medium{color:#60a5fa}
+.opp{color:#4ade80}
+.ins-headline{font-size:14px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.ins-body{font-size:12.5px;color:#cfd6e4;line-height:1.58}
+.ins-action{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);
+  font-size:12px;color:var(--gold-lt);font-weight:600;line-height:1.4}
+
+/* ── CHECKLIST ── */
+.checklist{margin-top:22px;padding:18px;
+  background:rgba(255,255,255,.07);border-radius:10px;
+  border:1px solid rgba(255,255,255,.1)}
+.cl-title{font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:#9aa3b5;margin-bottom:12px}
+.cl-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:13px;color:#cfd6e4}
+.cl-grid label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.cl-grid input{margin-top:2px;accent-color:var(--gold);flex-shrink:0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .row-2-1,.row-1-1{grid-template-columns:1fr}
+  .ins-grid{grid-template-columns:1fr}
+  .cl-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-name">TENDs <em>×</em> Earth</span>
+    <span class="badge">ANALYTICS</span>
+  </div>
+  <div class="topbar-right">
+    <span class="daterange">Jun 1 – Jun 26, 2026</span>
+    <span class="live">Demo data — connect PostHog to go live</span>
+  </div>
+</header>
+
+<!-- WARNING BANNER -->
+<div class="notice">
+  ⚠️ <strong>Form responses are currently going nowhere.</strong> The submit handler only fires <code>console.log</code> — zero data is stored. See the <a onclick="document.getElementById('setup').scrollIntoView({behavior:'smooth'})">setup checklist</a> below to fix this.
+</div>
+
+<main class="main">
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Total Visitors</div>
+      <div class="kpi-value">843</div>
+      <div class="kpi-trend">↑ 31% vs prev. period</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Leads Captured</div>
+      <div class="kpi-value">178</div>
+      <div class="kpi-trend down">↑ 24% — but 0 in Klaviyo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Conversion Rate</div>
+      <div class="kpi-value">21.1%</div>
+      <div class="kpi-trend">↑ 2.4pp vs prev. period</div>
+      <div class="kpi-note">Landed → submitted</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Top Outlet</div>
+      <div class="kpi-value" style="font-size:21px;margin-top:4px;line-height:1.2">Bandra<br>Waterfield</div>
+      <div class="kpi-note">35% of all leads</div>
+    </div>
+  </div>
+
+  <!-- TRAFFIC + OUTLET DONUT -->
+  <div class="row-2-1">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Daily Visitors vs Leads</div>
+          <div class="card-sub">Unique page loads · Jun 1–26, 2026</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="position:relative;height:210px">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Outlet Attribution</div>
+          <div class="card-sub">Where visitors spotted TENDS</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+        <div style="position:relative;height:175px">
+          <canvas id="outletDonut"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNNEL + LEADERBOARD -->
+  <div class="row-1-1">
+
+    <!-- Funnel -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Conversion Funnel</div>
+          <div class="card-sub">Visitor journey — landing to lead</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+        <ul class="funnel">
+          <li class="fstep">
+            <span class="fnum">1</span>
+            <div class="finfo">
+              <div class="flabel">Landed on page</div>
+              <div class="fbar-wrap"><div class="fbar-fill" style="width:100%"></div></div>
+            </div>
+            <div class="fnums"><div class="fcount">843</div><div class="fpct">100%</div></div>
+          </li>
+          <li class="fstep">
+            <span class="fnum">2</span>
+            <div class="finfo">
+              <div class="flabel">Scrolled to chips</div>
+              <div class="fbar-wrap"><div class="fbar-fill" style="width:93.8%"></div></div>
+            </div>
+            <div class="fnums"><div class="fcount">791</div><div class="fpct">93.8%</div></div>
+            <span class="fdrop">−6.2%</span>
+          </li>
+          <li class="fstep">
+            <span class="fnum">3</span>
+            <div class="finfo">
+              <div class="flabel">Selected an outlet</div>
+              <div class="fbar-wrap"><div class="fbar-fill" style="width:60.7%"></div></div>
+            </div>
+            <div class="fnums"><div class="fcount">512</div><div class="fpct">60.7%</div></div>
+            <span class="fdrop">−33.1%</span>
+          </li>
+          <li class="fstep">
+            <span class="fnum">4</span>
+            <div class="finfo">
+              <div class="flabel">Touched the form</div>
+              <div class="fbar-wrap"><div class="fbar-fill" style="width:34%"></div></div>
+            </div>
+            <div class="fnums"><div class="fcount">287</div><div class="fpct">34.0%</div></div>
+            <span class="fdrop">−26.7%</span>
+          </li>
+          <li class="fstep">
+            <span class="fnum">5</span>
+            <div class="finfo">
+              <div class="flabel">Submitted form ✓</div>
+              <div class="fbar-wrap"><div class="fbar-fill accent" style="width:21.1%"></div></div>
+            </div>
+            <div class="fnums"><div class="fcount">178</div><div class="fpct">21.1%</div></div>
+            <span class="fdrop">−12.9%</span>
+          </li>
+        </ul>
+        <div style="margin-top:14px;padding:10px 14px;background:#f9f6ef;border-radius:10px;font-size:12.5px;color:var(--mute)">
+          <strong style="color:var(--navy)">Key insight:</strong> The biggest drop is chip→form (60% → 34%). Tightening this gap from 60% to 45% would add ~43 extra leads per 843 visitors.
+        </div>
+      </div>
+    </div>
+
+    <!-- Outlet leaderboard -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Outlet Leaderboard</div>
+          <div class="card-sub">Leads attributed by location</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+        <ul class="ol-list">
+          <li class="ol-item">
+            <span class="ol-rank">1</span>
+            <span class="ol-name">Bandra Waterfield</span>
+            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:100%"></div></div></div>
+            <span class="ol-count">62</span><span class="ol-pct">34.8%</span>
+          </li>
+          <li class="ol-item">
+            <span class="ol-rank">2</span>
+            <span class="ol-name">Juhu</span>
+            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:63%"></div></div></div>
+            <span class="ol-count">39</span><span class="ol-pct">21.9%</span>
+          </li>
+          <li class="ol-item">
+            <span class="ol-rank">3</span>
+            <span class="ol-name">Bandra BKC</span>
+            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:52%"></div></div></div>
+            <span class="ol-count">32</span><span class="ol-pct">18.0%</span>
+          </li>
+          <li class="ol-item">
+            <span class="ol-rank">4</span>
+            <span class="ol-name">Lower Parel</span>
+            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:42%"></div></div></div>
+            <span class="ol-count">26</span><span class="ol-pct">14.6%</span>
+          </li>
+          <li class="ol-item">
+            <span class="ol-rank">5</span>
+            <span class="ol-name">Churchgate</span>
+            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:31%"></div></div></div>
+            <span class="ol-count">19</span><span class="ol-pct">10.7%</span>
+          </li>
+        </ul>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--mute)">
+          178 attributed leads · 665 visitors did not select an outlet
+        </div>
+
+        <!-- Time of day mini chart -->
+        <div style="margin-top:20px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:12px">Submissions by time of day</div>
+          <div style="position:relative;height:80px">
+            <canvas id="timeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT LEADS -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Recent Leads</div>
+        <div class="card-sub">Last 8 form submissions — illustrative sample</div>
+      </div>
+      <div style="font-size:12px;color:var(--gold);font-weight:700;background:rgba(205,58,84,.08);padding:4px 12px;border-radius:8px">
+        ⚠ Not persisted yet
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="leads-tbl">
+        <thead>
+          <tr>
+            <th>Dog</th>
+            <th>Activity</th>
+            <th>Age · Weight</th>
+            <th>Outlet</th>
+            <th>WhatsApp</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="dog-name">Bruno</div></td><td>Shih Tzu</td><td>3 yr · 4.2 kg</td><td><span class="pill">Juhu</span></td><td>+91 98×× ×××××</td><td class="time">2h ago</td></tr>
+          <tr><td><div class="dog-name">Mochi</div></td><td>Chihuahua</td><td>1 yr · 2.8 kg</td><td><span class="pill">Bandra WF</span></td><td>+91 77×× ×××××</td><td class="time">4h ago</td></tr>
+          <tr><td><div class="dog-name">Pickle</div></td><td>Dachshund</td><td>5 yr · 7.1 kg</td><td><span class="pill">BKC</span></td><td>+91 90×× ×××××</td><td class="time">6h ago</td></tr>
+          <tr><td><div class="dog-name">Latte</div></td><td>Pomeranian</td><td>2 yr · 3.5 kg</td><td><span class="pill">Lower Parel</span></td><td>+91 86×× ×××××</td><td class="time">Yesterday</td></tr>
+          <tr><td><div class="dog-name">Biscuit</div></td><td>Maltese</td><td>4 yr · 3.9 kg</td><td><span class="pill">Churchgate</span></td><td>+91 99×× ×××××</td><td class="time">Yesterday</td></tr>
+          <tr><td><div class="dog-name">Coco</div></td><td>Pug</td><td>2 yr · 8.2 kg</td><td><span class="pill">Bandra WF</span></td><td>+91 82×× ×××××</td><td class="time">2 days ago</td></tr>
+          <tr><td><div class="dog-name">Teddy</div></td><td>Beagle</td><td>6 yr · 9.4 kg</td><td><span class="pill">Juhu</span></td><td>+91 91×× ×××××</td><td class="time">2 days ago</td></tr>
+          <tr><td><div class="dog-name">Oreo</div></td><td>Shih Tzu</td><td>1 yr · 4.0 kg</td><td><span class="pill">Bandra WF</span></td><td>+91 88×× ×××××</td><td class="time">3 days ago</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BA INSIGHTS -->
+  <div class="insights" id="setup">
+    <div class="ins-title">📊 Business Analyst Briefing</div>
+    <div class="ins-sub">6 findings ranked by urgency — what to act on and in what order</div>
+
+    <div class="ins-grid">
+
+      <div class="ins-card">
+        <div class="ins-priority critical">🔴 Critical — Fix Within 48h</div>
+        <div class="ins-headline">Every lead submitted so far has been lost</div>
+        <div class="ins-body">The form fires <code style="font-size:11px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px">console.log</code> and stops. No database, no Klaviyo, no Google Sheet. You've been collecting intent from real Mumbai dog owners and discarding it. These people will never be re-engaged — the window closes when they leave Earth Cafe.</div>
+        <div class="ins-action">→ Wire Klaviyo subscribe + a Sheets/Airtable webhook as a redundant backup. 2h of work, permanent fix.</div>
+      </div>
+
+      <div class="ins-card">
+        <div class="ins-priority critical">🔴 Critical — Fix This Week</div>
+        <div class="ins-headline">No analytics = no way to optimise anything</div>
+        <div class="ins-body">Without PostHog or Mixpanel you cannot see where people drop off, which QR placement drives scans, whether Bandra WF really is #1, or if the weekend spike is real. Every decision you make is a guess. The data in this dashboard is illustrative — not real.</div>
+        <div class="ins-action">→ Drop PostHog snippet into index.html (15-min task, free up to 1M events/month). We can do this now.</div>
+      </div>
+
+      <div class="ins-card">
+        <div class="ins-priority high">🟡 High — Act This Month</div>
+        <div class="ins-headline">Weekends drive 3× more traffic — you're not capitalising on it</div>
+        <div class="ins-body">Saturday + Sunday account for ~60% of weekly visitors on just 2 of 7 days. Mumbai goes to brunch at Earth Cafe on weekends. You have no weekend-specific activation: no extra sampling, no staff briefing, no QR highlight. The ROI on weekend-only effort is very high.</div>
+        <div class="ins-action">→ Add a weekend staff script + double sample stock Sat–Sun. Test at Bandra WF first, then roll out.</div>
+      </div>
+
+      <div class="ins-card">
+        <div class="ins-priority high">🟡 High — Act This Month</div>
+        <div class="ins-headline">Bandra Waterfield is the hero outlet — study and replicate it</div>
+        <div class="ins-body">35% of leads from one outlet means something is working there that isn't at the others — QR placement, staff awareness, customer profile, or table proximity to the caddy. You need to know which, because replicating it at Juhu and BKC alone could add 80+ leads/month.</div>
+        <div class="ins-action">→ Physically visit Bandra WF. Photograph QR placement. Brief staff at all 5 outlets using that standard.</div>
+      </div>
+
+      <div class="ins-card">
+        <div class="ins-priority medium">🔵 Medium — This Quarter</div>
+        <div class="ins-headline">The chip→form gap (60% → 34%) is your biggest conversion leak</div>
+        <div class="ins-body">People engage enough to select their outlet — they're genuinely curious — but only 56% of those proceed to touch the form. The offer headline "Ask our staff for your free pop" may feel passive on mobile. Test "Claim your free pop below" or moving the form above the pillars section.</div>
+        <div class="ins-action">→ A/B test CTA copy and form position. PostHog feature flags make this a 1-day build.</div>
+      </div>
+
+      <div class="ins-card">
+        <div class="ins-priority opp">🟢 Opportunity</div>
+        <div class="ins-headline">You're building one of the richest pet-owner databases in India</div>
+        <div class="ins-body">Name, breed, age, weight, WhatsApp, outlet — this is richer data than most pet brands collect at acquisition. Once Klaviyo is live, segment by breed + weight for hyper-personalised flows. Small dog owners are highly loyal and under-served. This list is worth far more than free pop giveaways.</div>
+        <div class="ins-action">→ Design Klaviyo flow: Welcome (Day 0) → Breed-specific education (Day 3) → First purchase offer (Day 7).</div>
+      </div>
+
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="checklist">
+      <div class="cl-title">Setup Checklist — to make this dashboard show real data</div>
+      <div class="cl-grid">
+        <label><input type="checkbox"> Create PostHog account (posthog.com) — free tier</label>
+        <label><input type="checkbox"> Add PostHog snippet + custom events to index.html</label>
+        <label><input type="checkbox"> Wire Klaviyo subscribe API in form submit handler</label>
+        <label><input type="checkbox"> Add Google Sheets / Airtable webhook as backup</label>
+        <label><input type="checkbox"> Test end-to-end: submit → verify in Klaviyo list</label>
+        <label><input type="checkbox"> Replace demo data in this dashboard with PostHog Query API</label>
+        <label><input type="checkbox"> Set up Klaviyo welcome flow (3-email sequence)</label>
+        <label><input type="checkbox"> Brief all 5 outlet staff on QR + free pop script</label>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.color = '#7a7468';
+
+const OUTLET_COLORS = ['#1B2A4A','#CD3A54','#6E8A7F','#22335c','#9aa3b5','#c8a97a','#7a6480'];
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60)   return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24)   return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+// Fill KPI cards
+function setKpi(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+let trafficChart, outletChart, timeChart;
+
+async function loadData() {
+  try {
+    const res  = await fetch('/api/data');
+    const data = await res.json();
+
+    const { leads, totalLeads, totalVisits, outletMap, leadsByDate, visitsByDate, byHour } = data;
+
+    // ── KPIs ──
+    const convRate = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(1) : '—';
+    setKpi('kpi-visits',  totalVisits  || 0);
+    setKpi('kpi-leads',   totalLeads   || 0);
+    setKpi('kpi-conv',    convRate + (convRate !== '—' ? '%' : ''));
+    const outlets = Object.keys(outletMap);
+    setKpi('kpi-outlets', outlets.length);
+
+    // ── Traffic chart (leads + visits by date) ──
+    const allDates = Array.from(new Set([
+      ...Object.keys(leadsByDate),
+      ...Object.keys(visitsByDate),
+    ])).sort();
+    const dayLabels   = allDates.map(d => fmtDate(d + 'T00:00:00'));
+    const visitorData = allDates.map(d => visitsByDate[d] || 0);
+    const leadData    = allDates.map(d => leadsByDate[d]  || 0);
+
+    if (trafficChart) trafficChart.destroy();
+    trafficChart = new Chart(document.getElementById('trafficChart'), {
+      type: 'line',
+      data: {
+        labels: dayLabels,
+        datasets: [
+          {
+            label: 'Visits',
+            data: visitorData,
+            borderColor: '#1B2A4A',
+            backgroundColor: 'rgba(27,42,74,.09)',
+            borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#1B2A4A', tension: .42, fill: true,
+          },
+          {
+            label: 'Leads',
+            data: leadData,
+            borderColor: '#CD3A54',
+            backgroundColor: 'rgba(205,58,84,.1)',
+            borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
+            pointHoverBackgroundColor: '#CD3A54', tension: .42, fill: true,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 10, font: { size: 11 }, padding: 16 } },
+          tooltip: {
+            backgroundColor: '#1B2A4A', titleFont: { size: 12 }, bodyFont: { size: 12 }, padding: 11,
+            callbacks: {
+              afterBody: ctx => {
+                const v = ctx[0]?.raw || 0, l = ctx[1]?.raw || 0;
+                return v > 0 ? [`Conv. rate: ${((l/v)*100).toFixed(1)}%`] : [];
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 9 } },
+          y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { size: 10 } }, beginAtZero: true }
+        }
+      }
+    });
+
+    // ── Outlet donut ──
+    const outletLabels = Object.keys(outletMap);
+    const outletData   = outletLabels.map(k => outletMap[k]);
+    const total = outletData.reduce((a, b) => a + b, 0);
+
+    if (outletChart) outletChart.destroy();
+    outletChart = new Chart(document.getElementById('outletDonut'), {
+      type: 'doughnut',
+      data: {
+        labels: outletLabels,
+        datasets: [{ data: outletData, backgroundColor: OUTLET_COLORS, borderWidth: 0, hoverOffset: 7 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '70%',
+        plugins: {
+          legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 }, padding: 8 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} leads (${total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0}%)` } }
+        }
+      }
+    });
+
+    // ── Time of day (IST = UTC+5:30) ──
+    const IST_OFFSET = 5.5;
+    const byHourIST  = Array(24).fill(0);
+    byHour.forEach((v, h) => {
+      const istH = (h + Math.round(IST_OFFSET)) % 24;
+      byHourIST[istH] += v;
+    });
+    const slotLabels = ['12–2am','2–4am','4–6am','6–8am','8–10am','10–12pm','12–2pm','2–4pm','4–6pm','6–8pm','8–10pm','10–12am'];
+    const slotData   = slotLabels.map((_, i) => byHourIST[i*2] + (byHourIST[i*2+1] || 0));
+    const peakVal    = Math.max(...slotData);
+
+    if (timeChart) timeChart.destroy();
+    timeChart = new Chart(document.getElementById('timeChart'), {
+      type: 'bar',
+      data: {
+        labels: slotLabels,
+        datasets: [{ data: slotData, backgroundColor: slotData.map(v => v === peakVal && peakVal > 0 ? '#CD3A54' : 'rgba(27,42,74,.18)'), borderRadius: 5, borderSkipped: false }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} submissions` } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          y: { display: false, beginAtZero: true }
+        }
+      }
+    });
+
+    // ── Recent leads table ──
+    const tbody = document.querySelector('.leads-tbl tbody');
+    if (tbody && leads.length > 0) {
+      tbody.innerHTML = leads.slice(0, 10).map(l => `
+        <tr>
+          <td><div class="dog-name">${l.dogName || '—'}</div><div style="font-size:11px;color:var(--mute)">${l.ownerName || ''}</div></td>
+          <td>${l.activityLevel ? l.activityLevel.split('—')[0].trim() : '—'}</td>
+          <td>${l.age ? l.age + ' yr' : '—'} · ${l.weight ? l.weight + ' kg' : '—'}</td>
+          <td><span class="pill">${l.outlet || 'Unknown'}</span></td>
+          <td>${l.phone ? l.phone.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2×××××') : '—'}</td>
+          <td class="time">${timeAgo(l.submittedAt)}</td>
+        </tr>`).join('');
+
+      // update table subtitle
+      const sub = document.querySelector('.leads-tbl')?.closest('.card')?.querySelector('.card-sub');
+      if (sub) sub.textContent = `Last ${Math.min(leads.length, 10)} submissions — live from Airtable`;
+
+      // remove "not persisted" badge
+      const badge = document.querySelector('.leads-tbl')?.closest('.card')?.querySelector('[style*="Not persisted"]');
+      if (badge) badge.remove();
+    } else if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--mute)">No leads yet</td></tr>';
+    }
+
+    // ── Update outlet attribution line ──
+    const attrLine = document.querySelector('[style*="attributed leads"]');
+    if (attrLine) {
+      const attributed = Object.entries(outletMap).filter(([k]) => k !== 'Unknown').reduce((a,[,v]) => a+v, 0);
+      const unattributed = (outletMap['Unknown'] || 0);
+      attrLine.textContent = `${attributed} attributed leads · ${unattributed} without outlet selection`;
+    }
+
+    // ── Hide notice banner once data loads ──
+    const notice = document.querySelector('.notice');
+    if (notice) notice.style.display = 'none';
+
+  } catch (e) {
+    console.error('Dashboard data error:', e);
+  }
+}
+
+loadData();
+setInterval(loadData, 60000); // refresh every 60s
+</script>
+
+</body>
+</html>
