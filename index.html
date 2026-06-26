@@ -442,10 +442,10 @@ async function loadData() {
     set('kpi-leads-trend',  totalLeads  > 0 ? `${totalLeads} submissions total` : 'No leads yet');
 
     // ── Traffic chart date range subtitle ──
-    const allDates = Object.keys({...leadsByDate, ...visitsByDate}).sort();
-    if (allDates.length > 0) {
+    const subtitleDates = Object.keys({...leadsByDate, ...visitsByDate}).sort();
+    if (subtitleDates.length > 0) {
       const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-      set('traffic-sub', `Unique page loads · ${fmt(allDates[0])} – ${fmt(allDates[allDates.length-1])}`);
+      set('traffic-sub', `Unique page loads · ${fmt(subtitleDates[0])} – ${fmt(subtitleDates[subtitleDates.length-1])}`);
     } else {
       set('traffic-sub', 'No data yet');
     }
