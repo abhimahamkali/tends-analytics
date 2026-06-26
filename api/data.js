@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       weight:        f['Weight (kg)']    || '',
       activityLevel: f['Activity Level'] || '',
       outlet:        (typeof f['Outlet'] === 'object' ? f['Outlet'].name : (f['Outlet'] || 'Unknown')).replace(/\b\w/g, c => c.toUpperCase()),
+      partner:       (typeof f['Partner'] === 'object' ? f['Partner'].name : f['Partner']) || 'Earth Cafe',
       source:        f['Source']         || '',
       submittedAt:   f['Submitted At']   || r.createdTime,
     };
@@ -50,6 +51,7 @@ export default async function handler(req, res) {
     return {
       timestamp: f['Timestamp'] || r.createdTime,
       outlet:    f['Outlet']    || 'Unknown',
+      partner:   (typeof f['Partner'] === 'object' ? f['Partner'].name : f['Partner']) || 'Earth Cafe',
       source:    f['Source']    || '',
       date:      f['Date']      || (r.createdTime || '').slice(0, 10),
     };
