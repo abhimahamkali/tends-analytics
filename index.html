@@ -491,8 +491,9 @@ function renderDashboard(data) {
       setHtml('kpi-top-outlet', topName.replace(' ', '<br>'));
       set('kpi-top-outlet-pct', `${topPct}% of all leads`);
     } else {
-      setHtml('kpi-top-outlet', '—');
-      set('kpi-top-outlet-pct', totalLeads > 0 ? 'No outlet tagged' : '');
+      // No named outlets (e.g. Cafe Pilgrim has no outlet selector) — keep blank
+      setHtml('kpi-top-outlet', '&nbsp;');
+      set('kpi-top-outlet-pct', '');
     }
 
     set('kpi-visits-trend', totalVisits > 0 ? `${totalVisits} page loads total` : 'No visits yet');
