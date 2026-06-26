@@ -558,6 +558,7 @@ function renderDashboard(data) {
     const dayLabels   = allDates.map(d => fmtDate(d + 'T00:00:00'));
     const visitorData = allDates.map(d => visitsByDate[d] || 0);
     const leadData    = allDates.map(d => leadsByDate[d]  || 0);
+    const ptR = dayLabels.length <= 2 ? 4.5 : 0;  // show dots when there are too few days to draw a line
 
     if (trafficChart) trafficChart.destroy();
     trafficChart = new Chart(document.getElementById('trafficChart'), {
@@ -570,7 +571,7 @@ function renderDashboard(data) {
             data: visitorData,
             borderColor: '#1B2A4A',
             backgroundColor: 'rgba(27,42,74,.09)',
-            borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5,
+            borderWidth: 2.5, pointRadius: ptR, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#1B2A4A', tension: .42, fill: true,
           },
           {
@@ -578,7 +579,7 @@ function renderDashboard(data) {
             data: leadData,
             borderColor: '#CD3A54',
             backgroundColor: 'rgba(205,58,84,.1)',
-            borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
+            borderWidth: 2, pointRadius: ptR, pointHoverRadius: 4,
             pointHoverBackgroundColor: '#CD3A54', tension: .42, fill: true,
           }
         ]
