@@ -321,65 +321,67 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   <!-- BA INSIGHTS -->
   <div class="insights" id="setup">
     <div class="ins-title">📊 Business Analyst Briefing</div>
-    <div class="ins-sub">6 findings ranked by urgency — what to act on and in what order</div>
+    <div class="ins-sub">Live pipeline status + what to act on next, ranked by urgency · verified 26 Jun 2026</div>
 
     <div class="ins-grid">
 
       <div class="ins-card">
-        <div class="ins-priority critical">🔴 Critical — Fix Within 48h</div>
-        <div class="ins-headline">Every lead submitted so far has been lost</div>
-        <div class="ins-body">The form fires <code style="font-size:11px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px">console.log</code> and stops. No database, no Klaviyo, no Google Sheet. You've been collecting intent from real Mumbai dog owners and discarding it. These people will never be re-engaged — the window closes when they leave Earth Cafe.</div>
-        <div class="ins-action">→ Wire Klaviyo subscribe + a Sheets/Airtable webhook as a redundant backup. 2h of work, permanent fix.</div>
+        <div class="ins-priority opp">🟢 Live — Verified</div>
+        <div class="ins-headline">Lead capture is working end-to-end</div>
+        <div class="ins-body">The form posts to <code style="font-size:11px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px">/api/submit</code> — every lead is saved to Airtable and upserted into the Klaviyo list "Earth Cafe × TENDS". Confirmed live: real owners (Bruno, Harold, Tony…) are landing in the Leads table. No intent is being discarded.</div>
+        <div class="ins-action">→ Done. Monitor Klaviyo deliverability as volume grows.</div>
       </div>
 
       <div class="ins-card">
-        <div class="ins-priority critical">🔴 Critical — Fix This Week</div>
-        <div class="ins-headline">No analytics = no way to optimise anything</div>
-        <div class="ins-body">Without PostHog or Mixpanel you cannot see where people drop off, which QR placement drives scans, whether Bandra WF really is #1, or if the weekend spike is real. Every decision you make is a guess. The data in this dashboard is illustrative — not real.</div>
-        <div class="ins-action">→ Drop PostHog snippet into index.html (15-min task, free up to 1M events/month). We can do this now.</div>
+        <div class="ins-priority opp">🟢 Live — Real Data</div>
+        <div class="ins-headline">This dashboard shows real Airtable data</div>
+        <div class="ins-body">Every KPI, chart, leaderboard and the recent-leads table is fetched live from <code style="font-size:11px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px">/api/data</code> (Airtable Leads + Visits) and refreshed every 60s. No demo/placeholder numbers remain. Page visits are logged on every load via /api/pageview.</div>
+        <div class="ins-action">→ Done. The numbers above are your actual activation data.</div>
       </div>
 
       <div class="ins-card">
-        <div class="ins-priority high">🟡 High — Act This Month</div>
-        <div class="ins-headline">Weekends drive 3× more traffic — you're not capitalising on it</div>
-        <div class="ins-body">Saturday + Sunday account for ~60% of weekly visitors on just 2 of 7 days. Mumbai goes to brunch at Earth Cafe on weekends. You have no weekend-specific activation: no extra sampling, no staff briefing, no QR highlight. The ROI on weekend-only effort is very high.</div>
-        <div class="ins-action">→ Add a weekend staff script + double sample stock Sat–Sun. Test at Bandra WF first, then roll out.</div>
+        <div class="ins-priority critical">🔴 Gap — Do This Week</div>
+        <div class="ins-headline">No in-page product analytics yet</div>
+        <div class="ins-body">Airtable tells you how many landed and converted — but not <em>where</em> people drop off inside the page, scroll depth, or which QR placement drives scans. Without an events tool, every UX change is a guess.</div>
+        <div class="ins-action">→ Add PostHog (free to 1M events/mo). Needs a free account + project key, then it's a 15-min snippet drop into index.html.</div>
       </div>
 
       <div class="ins-card">
-        <div class="ins-priority high">🟡 High — Act This Month</div>
-        <div class="ins-headline">Bandra Waterfield is the hero outlet — study and replicate it</div>
-        <div class="ins-body">35% of leads from one outlet means something is working there that isn't at the others — QR placement, staff awareness, customer profile, or table proximity to the caddy. You need to know which, because replicating it at Juhu and BKC alone could add 80+ leads/month.</div>
-        <div class="ins-action">→ Physically visit Bandra WF. Photograph QR placement. Brief staff at all 5 outlets using that standard.</div>
+        <div class="ins-priority high">🟡 Gap — Act This Month</div>
+        <div class="ins-headline">Leads land in Klaviyo but get no follow-up</div>
+        <div class="ins-body">Profiles are added to the list with dog name, age, weight, activity & outlet — but there's no automated nurture, so the moment of intent goes cold. This is the highest-leverage piece still unbuilt.</div>
+        <div class="ins-action">→ Build Klaviyo flow: Welcome (Day 0) → breed/activity education (Day 3) → first-purchase offer (Day 7).</div>
       </div>
 
       <div class="ins-card">
-        <div class="ins-priority medium">🔵 Medium — This Quarter</div>
-        <div class="ins-headline">The chip→form gap (60% → 34%) is your biggest conversion leak</div>
-        <div class="ins-body">People engage enough to select their outlet — they're genuinely curious — but only 56% of those proceed to touch the form. The offer headline "Ask our staff for your free pop" may feel passive on mobile. Test "Claim your free pop below" or moving the form above the pillars section.</div>
-        <div class="ins-action">→ A/B test CTA copy and form position. PostHog feature flags make this a 1-day build.</div>
+        <div class="ins-priority medium">🔵 Data Quality</div>
+        <div class="ins-headline">Most leads have no outlet, and outlet names are duplicated</div>
+        <div class="ins-body">Many submissions show "Unknown" (direct link / no outlet selected), and the Airtable Outlet field has case-duplicate options ("Juhu" vs "juhu"). This muddies attribution — the dashboard title-cases for display, but the source data should be cleaned.</div>
+        <div class="ins-action">→ Bake ?outlet= into the QR for all 5 sites; merge the duplicate Airtable options.</div>
       </div>
 
       <div class="ins-card">
         <div class="ins-priority opp">🟢 Opportunity</div>
         <div class="ins-headline">You're building one of the richest pet-owner databases in India</div>
-        <div class="ins-body">Name, breed, age, weight, WhatsApp, outlet — this is richer data than most pet brands collect at acquisition. Once Klaviyo is live, segment by breed + weight for hyper-personalised flows. Small dog owners are highly loyal and under-served. This list is worth far more than free pop giveaways.</div>
-        <div class="ins-action">→ Design Klaviyo flow: Welcome (Day 0) → Breed-specific education (Day 3) → First purchase offer (Day 7).</div>
+        <div class="ins-body">Name, age, weight, activity, WhatsApp, outlet — richer than most pet brands collect at acquisition. Segment by weight + activity for hyper-personalised flows. Small-dog owners are highly loyal and under-served — this list is worth far more than free-pop giveaways.</div>
+        <div class="ins-action">→ Once the welcome flow is live, layer breed/weight-specific journeys on top.</div>
       </div>
 
     </div>
 
     <!-- CHECKLIST -->
     <div class="checklist">
-      <div class="cl-title">Setup Checklist — to make this dashboard show real data</div>
+      <div class="cl-title">Setup checklist — live status</div>
       <div class="cl-grid">
+        <label><input type="checkbox" checked> Wire Klaviyo subscribe in form submit handler</label>
+        <label><input type="checkbox" checked> Save every lead to Airtable (Leads table)</label>
+        <label><input type="checkbox" checked> Log page visits to Airtable (Visits table)</label>
+        <label><input type="checkbox" checked> Dashboard reads real data from /api/data</label>
+        <label><input type="checkbox" checked> Test end-to-end: submit → verify in Airtable + Klaviyo</label>
         <label><input type="checkbox"> Create PostHog account (posthog.com) — free tier</label>
         <label><input type="checkbox"> Add PostHog snippet + custom events to index.html</label>
-        <label><input type="checkbox"> Wire Klaviyo subscribe API in form submit handler</label>
-        <label><input type="checkbox"> Add Google Sheets / Airtable webhook as backup</label>
-        <label><input type="checkbox"> Test end-to-end: submit → verify in Klaviyo list</label>
-        <label><input type="checkbox"> Replace demo data in this dashboard with PostHog Query API</label>
         <label><input type="checkbox"> Set up Klaviyo welcome flow (3-email sequence)</label>
+        <label><input type="checkbox"> Clean up duplicate Airtable outlet options</label>
         <label><input type="checkbox"> Brief all 5 outlet staff on QR + free pop script</label>
       </div>
     </div>
