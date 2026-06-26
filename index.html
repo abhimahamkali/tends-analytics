@@ -180,24 +180,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   <div class="kpi-grid">
     <div class="kpi">
       <div class="kpi-label">Total Visitors</div>
-      <div class="kpi-value">843</div>
-      <div class="kpi-trend">↑ 31% vs prev. period</div>
+      <div class="kpi-value" id="kpi-visits">—</div>
+      <div class="kpi-trend" id="kpi-visits-trend"></div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Leads Captured</div>
-      <div class="kpi-value">178</div>
-      <div class="kpi-trend down">↑ 24% — but 0 in Klaviyo</div>
+      <div class="kpi-value" id="kpi-leads">—</div>
+      <div class="kpi-trend" id="kpi-leads-trend"></div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Conversion Rate</div>
-      <div class="kpi-value">21.1%</div>
-      <div class="kpi-trend">↑ 2.4pp vs prev. period</div>
+      <div class="kpi-value" id="kpi-conv">—</div>
       <div class="kpi-note">Landed → submitted</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Top Outlet</div>
-      <div class="kpi-value" style="font-size:21px;margin-top:4px;line-height:1.2">Bandra<br>Waterfield</div>
-      <div class="kpi-note">35% of all leads</div>
+      <div class="kpi-value" id="kpi-top-outlet" style="font-size:21px;margin-top:4px;line-height:1.2">—</div>
+      <div class="kpi-note" id="kpi-top-outlet-pct"></div>
     </div>
   </div>
 
@@ -207,7 +206,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       <div class="card-head">
         <div>
           <div class="card-title">Daily Visitors vs Leads</div>
-          <div class="card-sub">Unique page loads · Jun 1–26, 2026</div>
+          <div class="card-sub" id="traffic-sub">Loading…</div>
         </div>
       </div>
       <div class="card-body">
@@ -244,54 +243,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         </div>
       </div>
       <div class="card-body" style="padding-top:12px">
-        <ul class="funnel">
+        <ul class="funnel" id="funnel-list">
           <li class="fstep">
             <span class="fnum">1</span>
             <div class="finfo">
               <div class="flabel">Landed on page</div>
               <div class="fbar-wrap"><div class="fbar-fill" style="width:100%"></div></div>
             </div>
-            <div class="fnums"><div class="fcount">843</div><div class="fpct">100%</div></div>
+            <div class="fnums"><div class="fcount" id="funnel-visits">—</div><div class="fpct">100%</div></div>
           </li>
           <li class="fstep">
             <span class="fnum">2</span>
             <div class="finfo">
-              <div class="flabel">Scrolled to chips</div>
-              <div class="fbar-wrap"><div class="fbar-fill" style="width:93.8%"></div></div>
-            </div>
-            <div class="fnums"><div class="fcount">791</div><div class="fpct">93.8%</div></div>
-            <span class="fdrop">−6.2%</span>
-          </li>
-          <li class="fstep">
-            <span class="fnum">3</span>
-            <div class="finfo">
-              <div class="flabel">Selected an outlet</div>
-              <div class="fbar-wrap"><div class="fbar-fill" style="width:60.7%"></div></div>
-            </div>
-            <div class="fnums"><div class="fcount">512</div><div class="fpct">60.7%</div></div>
-            <span class="fdrop">−33.1%</span>
-          </li>
-          <li class="fstep">
-            <span class="fnum">4</span>
-            <div class="finfo">
-              <div class="flabel">Touched the form</div>
-              <div class="fbar-wrap"><div class="fbar-fill" style="width:34%"></div></div>
-            </div>
-            <div class="fnums"><div class="fcount">287</div><div class="fpct">34.0%</div></div>
-            <span class="fdrop">−26.7%</span>
-          </li>
-          <li class="fstep">
-            <span class="fnum">5</span>
-            <div class="finfo">
               <div class="flabel">Submitted form ✓</div>
-              <div class="fbar-wrap"><div class="fbar-fill accent" style="width:21.1%"></div></div>
+              <div class="fbar-wrap"><div class="fbar-fill accent" id="funnel-conv-bar" style="width:0%"></div></div>
             </div>
-            <div class="fnums"><div class="fcount">178</div><div class="fpct">21.1%</div></div>
-            <span class="fdrop">−12.9%</span>
+            <div class="fnums"><div class="fcount" id="funnel-leads">—</div><div class="fpct" id="funnel-conv-pct">—</div></div>
           </li>
         </ul>
-        <div style="margin-top:14px;padding:10px 14px;background:#f9f6ef;border-radius:10px;font-size:12.5px;color:var(--mute)">
-          <strong style="color:var(--navy)">Key insight:</strong> The biggest drop is chip→form (60% → 34%). Tightening this gap from 60% to 45% would add ~43 extra leads per 843 visitors.
+        <div style="margin-top:14px;padding:10px 14px;background:#f9f6ef;border-radius:10px;font-size:12.5px;color:var(--mute)" id="funnel-insight">
+          Loading real data…
         </div>
       </div>
     </div>
@@ -305,41 +276,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         </div>
       </div>
       <div class="card-body" style="padding-top:12px">
-        <ul class="ol-list">
-          <li class="ol-item">
-            <span class="ol-rank">1</span>
-            <span class="ol-name">Bandra Waterfield</span>
-            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:100%"></div></div></div>
-            <span class="ol-count">62</span><span class="ol-pct">34.8%</span>
-          </li>
-          <li class="ol-item">
-            <span class="ol-rank">2</span>
-            <span class="ol-name">Juhu</span>
-            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:63%"></div></div></div>
-            <span class="ol-count">39</span><span class="ol-pct">21.9%</span>
-          </li>
-          <li class="ol-item">
-            <span class="ol-rank">3</span>
-            <span class="ol-name">Bandra BKC</span>
-            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:52%"></div></div></div>
-            <span class="ol-count">32</span><span class="ol-pct">18.0%</span>
-          </li>
-          <li class="ol-item">
-            <span class="ol-rank">4</span>
-            <span class="ol-name">Lower Parel</span>
-            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:42%"></div></div></div>
-            <span class="ol-count">26</span><span class="ol-pct">14.6%</span>
-          </li>
-          <li class="ol-item">
-            <span class="ol-rank">5</span>
-            <span class="ol-name">Churchgate</span>
-            <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:31%"></div></div></div>
-            <span class="ol-count">19</span><span class="ol-pct">10.7%</span>
-          </li>
+        <ul class="ol-list" id="outlet-leaderboard">
+          <li style="padding:16px;text-align:center;color:var(--mute);font-size:13px">Loading…</li>
         </ul>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--mute)">
-          178 attributed leads · 665 visitors did not select an outlet
-        </div>
+        <div id="outlet-summary" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--mute)"></div>
 
         <!-- Time of day mini chart -->
         <div style="margin-top:20px">
@@ -480,10 +420,8 @@ function timeAgo(iso) {
 }
 
 // Fill KPI cards
-function setKpi(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
-}
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setHtml(id, val) { const el = document.getElementById(id); if (el) el.innerHTML = val; }
 
 let trafficChart, outletChart, timeChart;
 
@@ -496,11 +434,75 @@ async function loadData() {
 
     // ── KPIs ──
     const convRate = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(1) : '—';
-    setKpi('kpi-visits',  totalVisits  || 0);
-    setKpi('kpi-leads',   totalLeads   || 0);
-    setKpi('kpi-conv',    convRate + (convRate !== '—' ? '%' : ''));
+    set('kpi-visits', totalVisits || 0);
+    set('kpi-leads',  totalLeads  || 0);
+    set('kpi-conv',   convRate !== '—' ? convRate + '%' : '—');
+
+    // Top outlet (exclude Unknown)
+    const ranked = Object.entries(outletMap)
+      .filter(([k]) => k !== 'Unknown')
+      .sort((a, b) => b[1] - a[1]);
+    if (ranked.length > 0) {
+      const [topName, topCount] = ranked[0];
+      const topPct = totalLeads > 0 ? ((topCount / totalLeads) * 100).toFixed(0) : 0;
+      setHtml('kpi-top-outlet', topName.replace(' ', '<br>'));
+      set('kpi-top-outlet-pct', `${topPct}% of all leads`);
+    }
+
+    set('kpi-visits-trend', totalVisits > 0 ? `${totalVisits} page loads total` : 'No visits yet');
+    set('kpi-leads-trend',  totalLeads  > 0 ? `${totalLeads} submissions total` : 'No leads yet');
+
+    // ── Traffic chart date range subtitle ──
+    const allDates = Object.keys({...leadsByDate, ...visitsByDate}).sort();
+    if (allDates.length > 0) {
+      const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+      set('traffic-sub', `Unique page loads · ${fmt(allDates[0])} – ${fmt(allDates[allDates.length-1])}`);
+    } else {
+      set('traffic-sub', 'No data yet');
+    }
+
+    // ── Funnel (visits → leads, real data only) ──
+    set('funnel-visits', totalVisits || 0);
+    set('funnel-leads',  totalLeads  || 0);
+    const convPct = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(1) : 0;
+    set('funnel-conv-pct', convPct + '%');
+    const barEl = document.getElementById('funnel-conv-bar');
+    if (barEl) barEl.style.width = Math.min(convPct, 100) + '%';
+    const insight = document.getElementById('funnel-insight');
+    if (insight) {
+      if (totalVisits > 0) {
+        const needed = Math.round(totalVisits * 0.45) - totalLeads;
+        insight.innerHTML = `<strong style="color:var(--navy)">Key insight:</strong> ${convPct}% of visitors submitted the form. ${needed > 0 ? `Lifting conversion to 45% would add ~${needed} more leads.` : 'Great conversion rate — keep it up!'}`;
+      } else {
+        insight.textContent = 'Visit the activation page to start collecting data.';
+      }
+    }
+
+    // ── Outlet leaderboard (real data) ──
+    const leaderboard = document.getElementById('outlet-leaderboard');
+    if (leaderboard && Object.keys(outletMap).length > 0) {
+      const sorted = Object.entries(outletMap).sort((a, b) => b[1] - a[1]);
+      const maxCount = sorted[0][1];
+      leaderboard.innerHTML = sorted.map(([name, count], i) => {
+        const pct = totalLeads > 0 ? ((count / totalLeads) * 100).toFixed(1) : 0;
+        const barW = maxCount > 0 ? ((count / maxCount) * 100).toFixed(0) : 0;
+        return `<li class="ol-item">
+          <span class="ol-rank">${i + 1}</span>
+          <span class="ol-name">${name}</span>
+          <div class="ol-bar-wrap"><div class="ol-bar"><div class="ol-bar-fill" style="width:${barW}%"></div></div></div>
+          <span class="ol-count">${count}</span><span class="ol-pct">${pct}%</span>
+        </li>`;
+      }).join('');
+    } else if (leaderboard) {
+      leaderboard.innerHTML = '<li style="padding:16px;text-align:center;color:var(--mute);font-size:13px">No leads yet</li>';
+    }
+
+    // Outlet summary line
+    const attributed = Object.entries(outletMap).filter(([k]) => k !== 'Unknown').reduce((a, [,v]) => a + v, 0);
+    const unknown = outletMap['Unknown'] || 0;
+    set('outlet-summary', `${attributed} attributed leads · ${unknown} without outlet selection`);
+
     const outlets = Object.keys(outletMap);
-    setKpi('kpi-outlets', outlets.length);
 
     // ── Traffic chart (leads + visits by date) ──
     const allDates = Array.from(new Set([
