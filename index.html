@@ -200,6 +200,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <select class="cafe-select" id="cafe-select" aria-label="Choose cafe">
       <option value="Earth Cafe">Earth Cafe</option>
       <option value="Cafe Pilgrim">Cafe Pilgrim</option>
+      <option value="Marshall">Marshall</option>
     </select>
     <div class="dr-wrap">
       <button class="daterange" id="dr-toggle" type="button"><span id="dr-label">All time</span> <span style="opacity:.55;font-size:10px">▾</span></button>
@@ -811,7 +812,7 @@ function setPreset(p) {
   if (!sel) return;
   sel.addEventListener('change', () => {
     cafe = sel.value;
-    if (brand) brand.innerHTML = cafe === 'Cafe Pilgrim' ? 'TENDs <em>×</em> Pilgrim' : 'TENDs <em>×</em> Earth';
+    if (brand) brand.innerHTML = cafe === 'Cafe Pilgrim' ? 'TENDs <em>×</em> Pilgrim' : cafe === 'Marshall' ? 'TENDs <em>×</em> Marshall' : 'TENDs <em>×</em> Earth';
     renderRange();
   });
 })();
