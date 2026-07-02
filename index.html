@@ -667,7 +667,7 @@ function renderDashboard(data) {
             <td>${l.activityLevel ? l.activityLevel.split('—')[0].trim() : '—'}</td>
             <td>${l.age ? l.age + ' yr' : '—'} · ${l.weight ? l.weight + ' kg' : '—'}</td>
             <td><span class="pill">${l.outlet || 'Unknown'}</span></td>
-            <td>${l.phone ? l.phone.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2×××××') : '—'}</td>
+            <td>${l.phone || '—'}</td>
             <td class="time">${timeAgo(l.submittedAt)}</td>
           </tr>`).join('');
         if (tblSub) tblSub.textContent = `Last ${Math.min(leads.length, 10)} submissions — live from Airtable`;
