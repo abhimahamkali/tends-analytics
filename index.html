@@ -46,6 +46,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   color:var(--ink);border:1px solid var(--line);border-radius:12px;
   box-shadow:0 10px 34px rgba(0,0,0,.28);padding:14px;width:260px;display:none}
 .dr-panel.show{display:block}
+.modal-backdrop{position:fixed;inset:0;background:rgba(27,42,74,.55);z-index:1000;
+  display:none;align-items:center;justify-content:center}
+.modal-backdrop.show{display:flex}
+.modal-card{background:var(--paper);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.35);
+  width:320px;max-width:90vw;padding:22px}
+.modal-card h3{font-size:16px;color:var(--navy);margin-bottom:6px}
+.modal-card p{font-size:12.5px;color:var(--mute);margin-bottom:16px}
+.modal-card input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+  font-size:14px;font-family:inherit;color:var(--ink);margin-bottom:8px}
+.modal-card input:focus{outline:2px solid var(--navy3);outline-offset:1px}
+.modal-error{font-size:12px;color:var(--gold-dk);margin-bottom:8px;display:none}
+.modal-error.show{display:block}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.modal-actions button{border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;
+  font-family:inherit;cursor:pointer;border:1px solid var(--line);background:#f4f0e6;color:var(--ink)}
+.modal-actions button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.modal-actions button.primary:disabled{opacity:.6;cursor:default}
+.modal-actions button:hover:not(:disabled){filter:brightness(1.05)}
 .dr-presets{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
 .dr-presets button{background:#f4f0e6;border:1px solid var(--line);border-radius:8px;
   padding:8px 9px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;
@@ -201,6 +219,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
       <option value="Earth Cafe">Earth Cafe</option>
       <option value="Cafe Pilgrim">Cafe Pilgrim</option>
       <option value="Marshall">Marshall</option>
+      <option value="__add__">+ Add cafe</option>
     </select>
     <div class="dr-wrap">
       <button class="daterange" id="dr-toggle" type="button"><span id="dr-label">All time</span> <span style="opacity:.55;font-size:10px">▾</span></button>
@@ -229,6 +248,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
   </div>
 </header>
 
+<div class="modal-backdrop" id="add-cafe-backdrop">
+  <div class="modal-card">
+    <h3>Add a cafe</h3>
+    <p>Give it a name — it'll appear in the switcher with a fresh, empty dashboard ready for its data.</p>
+    <input type="text" id="add-cafe-input" placeholder="e.g. Whiskers Cafe" maxlength="60" autocomplete="off">
+    <div class="modal-error" id="add-cafe-error"></div>
+    <div class="modal-actions">
+      <button type="button" id="add-cafe-cancel">Cancel</button>
+      <button type="button" id="add-cafe-submit" class="primary">Add cafe</button>
+    </div>
+  </div>
+</div>
 
 <main class="main">
 
@@ -692,9 +723,25 @@ function renderDashboard(data) {
 }
 
 // ===== Data fetch + date-range filtering =====
-let ALL = { leads: [], visits: [] };
+let ALL = { leads: [], visits: [], cafes: [] };
 let range = { start: null, end: null };  // YYYY-MM-DD inclusive; null = unbounded
 let cafe = 'Earth Cafe';                 // which activation to show
+
+function cafeShortLabel(name) {
+  if (name === 'Cafe Pilgrim') return 'Pilgrim';
+  if (name === 'Earth Cafe')   return 'Earth';
+  return name;
+}
+
+function populateCafeSelect(cafes) {
+  const sel = document.getElementById('cafe-select');
+  if (!sel) return;
+  const prev = cafe;
+  sel.innerHTML = cafes.map(name =>
+    `<option value="${name.replace(/"/g, '&quot;')}">${name}</option>`
+  ).join('') + '<option value="__add__">+ Add cafe</option>';
+  sel.value = cafes.includes(prev) ? prev : (cafes[0] || '');
+}
 
 async function loadData() {
   try {
@@ -702,6 +749,8 @@ async function loadData() {
     const d    = await res.json();
     ALL.leads  = d.allLeads  || d.leads || [];
     ALL.visits = d.allVisits || [];
+    ALL.cafes  = d.cafes && d.cafes.length ? d.cafes : ['Earth Cafe', 'Cafe Pilgrim', 'Marshall'];
+    populateCafeSelect(ALL.cafes);
     renderRange();
   } catch (e) {
     console.error('Dashboard data error:', e);
@@ -810,10 +859,90 @@ function setPreset(p) {
   const sel   = document.getElementById('cafe-select');
   const brand = document.getElementById('brand-name');
   if (!sel) return;
-  sel.addEventListener('change', () => {
-    cafe = sel.value;
-    if (brand) brand.innerHTML = cafe === 'Cafe Pilgrim' ? 'TENDs <em>×</em> Pilgrim' : cafe === 'Marshall' ? 'TENDs <em>×</em> Marshall' : 'TENDs <em>×</em> Earth';
+
+  function selectCafe(name) {
+    cafe = name;
+    if (brand) brand.innerHTML = `TENDs <em>×</em> ${cafeShortLabel(cafe)}`;
     renderRange();
+  }
+
+  sel.addEventListener('change', () => {
+    if (sel.value === '__add__') {
+      sel.value = cafe; // keep the select showing the current cafe while the modal is open
+      openAddCafeModal();
+      return;
+    }
+    selectCafe(sel.value);
+  });
+
+  window.selectCafe = selectCafe;
+})();
+
+// ===== Add-cafe modal =====
+function openAddCafeModal() {
+  const backdrop = document.getElementById('add-cafe-backdrop');
+  const input    = document.getElementById('add-cafe-input');
+  const error    = document.getElementById('add-cafe-error');
+  error.classList.remove('show');
+  input.value = '';
+  backdrop.classList.add('show');
+  setTimeout(() => input.focus(), 0);
+}
+
+function closeAddCafeModal() {
+  document.getElementById('add-cafe-backdrop').classList.remove('show');
+}
+
+(function initAddCafeModal() {
+  const backdrop = document.getElementById('add-cafe-backdrop');
+  const input    = document.getElementById('add-cafe-input');
+  const error    = document.getElementById('add-cafe-error');
+  const submit   = document.getElementById('add-cafe-submit');
+  const cancel   = document.getElementById('add-cafe-cancel');
+  if (!backdrop) return;
+
+  function showError(msg) {
+    error.textContent = msg;
+    error.classList.add('show');
+  }
+
+  async function submitCafe() {
+    const name = input.value.trim();
+    if (!name) { showError('Enter a cafe name.'); return; }
+
+    submit.disabled = true;
+    error.classList.remove('show');
+    try {
+      const res  = await fetch('/api/add-cafe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d.ok) {
+        showError(d.error || 'Could not add cafe. Try again.');
+        return;
+      }
+      if (!ALL.cafes.includes(d.name)) ALL.cafes.push(d.name);
+      populateCafeSelect(ALL.cafes);
+      document.getElementById('cafe-select').value = d.name;
+      window.selectCafe(d.name); // fresh, empty dashboard for the new cafe
+      closeAddCafeModal();
+    } catch (e) {
+      showError('Network error — try again.');
+    } finally {
+      submit.disabled = false;
+    }
+  }
+
+  submit.addEventListener('click', submitCafe);
+  cancel.addEventListener('click', closeAddCafeModal);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitCafe();
+    if (e.key === 'Escape') closeAddCafeModal();
+  });
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) closeAddCafeModal();
   });
 })();
 

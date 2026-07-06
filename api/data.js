@@ -1,6 +1,7 @@
 const BASE   = 'appk6C18dNxzJvss7';
 const LEADS  = 'tblco5qGhwJ7zePbo';
 const VISITS = 'tblpMxC5UeXyQuU5E';
+const CAFES  = 'tblzyyZTGMH7b7meW';
 
 async function fetchAll(pat, tableId) {
   const records = [];
@@ -22,9 +23,10 @@ export default async function handler(req, res) {
   const pat = process.env.AIRTABLE_PAT;
   if (!pat) return res.status(500).json({ error: 'No AIRTABLE_PAT' });
 
-  const [leadRecs, visitRecs] = await Promise.all([
+  const [leadRecs, visitRecs, cafeRecs] = await Promise.all([
     fetchAll(pat, LEADS),
     fetchAll(pat, VISITS),
+    fetchAll(pat, CAFES),
   ]);
 
   // ── Process leads ──
@@ -92,6 +94,12 @@ export default async function handler(req, res) {
     activityMap[a] = (activityMap[a] || 0) + 1;
   });
 
+  // ── Cafes (dashboard switcher list) ──
+  const cafes = cafeRecs
+    .sort((a, b) => (a.fields['Added At'] || a.createdTime).localeCompare(b.fields['Added At'] || b.createdTime))
+    .map(r => r.fields['Name'])
+    .filter(Boolean);
+
   return res.status(200).json({
     leads:         leads.slice(-20).reverse(), // last 20, newest first
     allLeads:      leads,   // full set — enables client-side date-range filtering
@@ -103,5 +111,6 @@ export default async function handler(req, res) {
     visitsByDate,
     byHour,
     activityMap,
+    cafes,
   });
 }
