@@ -135,10 +135,15 @@ export default async function handler(req, res) {
   });
 
   // ── Cafes (dashboard switcher list) ──
+  // Hidden from the switcher: "Grano cafe" is an empty duplicate of
+  // "Grano - Coffee Affairs" (which holds the real traffic), and Once Upon A
+  // Dine is no longer shown. Records are kept in Airtable — just not listed.
+  const HIDDEN_CAFES = new Set(['Grano cafe', 'Once Upon A Dine']);
   const cafes = cafeRecs
     .sort((a, b) => (a.fields['Added At'] || a.createdTime).localeCompare(b.fields['Added At'] || b.createdTime))
     .map(r => r.fields['Name'])
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter(name => !HIDDEN_CAFES.has(name));
 
   return res.status(200).json({
     leads:         leads.filter((l) => l.source !== 'seed').slice(-20).reverse(), // last 20 real leads, newest first
